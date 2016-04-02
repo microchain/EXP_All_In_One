@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="img/favicon.ico.gif">
+    <title>Expanse Proxy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/bignumber.min.js"></script>
+    <script type="text/javascript" src="js/web3.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+    <script type="text/javascript" src="js/stats.js"></script>
+    <script type="text/javascript" src="js/polo.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header clearfix">
+            <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <h3 class="text-muted"><img src="img/exp.png" height="42" width="38"> Expanse Proxy</h3>
+                    </div>
+                    <div>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+                            <li><a href="/settings.html"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                            <li><a href="/server.html"><span class="glyphicon glyphicon-dashboard"></span> Upstream</a></li>
+                            <li class="active"><a href="/stats.html"><span class="glyphicon glyphicon-stats"></span> Stats</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div id="alert" class="alert alert-danger hide" role="alert">
+            <strong>An error occured while polling proxy state.</strong> Make sure proxy is running.
+        </div>
+        <br>
+        <div class="col-md-2 text-center" style="width:20%;">
+            <div class="panel panel-primary">
+                <div data-toggle="tooltip" data-placement="top" title="Current Avg Network HashRate" class="panel-heading">
+                    <h3 class="panel-title">Avg HashRate</h3>
+                </div>
+                <div class="panel-body">
+                    <h4 id="avgHashrate"></h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 text-center" style="width:20%;">
+            <div class="panel panel-info">
+                <div data-toggle="tooltip" data-placement="top" title="Current Avg Network BlockTime" class="panel-heading">
+                    <h3 class="panel-title">Avg BlockTime</h3>
+                </div>
+                <div class="panel-body">
+                    <h4 id="avgBlocktime"></h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 text-center" style="width:20%;">
+            <div class="panel panel-danger">
+                <div data-toggle="tooltip" data-placement="top" title="Current Difficulty" class="panel-heading">
+                    <h3 class="panel-title">Difficulty</h3>
+                </div>
+                <div class="panel-body">
+                    <h4 id="difficulty"></h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 text-center" style="width:20%;">
+            <div class="panel panel-warning">
+                <div data-toggle="tooltip" data-placement="top" title="Last Block Number" class="panel-heading">
+                    <h3 class="panel-title">Last Block</h3>
+                </div>
+                <div class="panel-body">
+                    <h4 id="latestBlock"></h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 text-center" style="width:20%;">
+            <div class="panel panel-success">
+                <div data-toggle="tooltip" data-placement="top" title="Time Since Latest Block" class="panel-heading">
+                    <h3 class="panel-title">Last Block Time</h3>
+                </div>
+                <div class="panel-body">
+                    <h4 id="latestBlockTimestamp"></h4>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="panel panel-default">
+          <div class="panel-heading text-center"><b>Block Stats </b><span class="glyphicon glyphicon-th-large"></span></div>
+          <div class="panel-body text-center">
+          <div class="well well-sm" style="margin-bottom:0px;">
+            <h5>Latest Block Hash: <strong id="latestBlockHash"></strong></h5>
+            <h5>Parent Block Hash: <strong id="parentHash"></strong></h5>
+            <h5>State Root: <strong id="stateRoot"></strong></h5>
+            <h5>Latest Block Miner: <strong id="miner"></strong></h5>
+            <h5>Nonce: <strong id="nonce"></strong></h5>
+            <h5>Gas Limit: <strong id="gasLimit"></strong></h5>
+            <h5>Gas Used: <strong id="gasUsed"></strong></h5>
+            <h5>Size: <strong id="size"></strong></h5>
+            <h5>Extra Data: <strong id="extraData"></strong></h5>
+          </div>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="panel panel-default">
+          <div class="panel-heading text-center"><b>Poloniex Price / EXP Balance</b> <span style="font-size: 12px;"  class="glyphicon glyphicon-btc"></span></div>
+          <div class="panel-body text-center">
+            <div class="well well-sm" style="margin-bottom:5px;">
+            <h5 style="margin-bottom:0px; margin-top:0px; padding:4px;">BitCoin / Expanse: <span style="font-size: 12px; color: orange;" class="glyphicon glyphicon-btc"></span><strong id="BTC"></strong></h5>
+            <h5 style="margin-bottom:0px; margin-top:0px; padding:4px;">USD / Expanse: <span style="font-size: 12px; color: green;" class="glyphicon glyphicon-usd"></span><strong id="USD"></strong></h5>
+            </div>
+            <div class="well well-sm" style="margin-bottom:0px;">
+            <h5 style="margin-bottom:0px; margin-top:0px; padding:4px;">Balance Expanse: <b><strong id="getBalance" style="color: green;"></strong></b></h5>
+            <h5 style="margin-bottom:0px; margin-top:0px; padding:4px;">Balance BitCoin: <span style="font-size: 12px; color: orange;" class="glyphicon glyphicon-btc"></span><strong id="EXP-BTC"></strong></h5>
+            <h5 style="margin-bottom:0px; margin-top:0px; padding:4px;">Balance USD: <span style="font-size: 12px; color: green;" class="glyphicon glyphicon-usd"></span><strong id="EXP-USD"></strong></h5>
+            </div>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="panel panel-default">
+          <div class="panel-heading text-center"><b>Poloniex Chart</b> <span style="font-size: 12px;"  class="glyphicon glyphicon-th"></span></div>
+          <div class="panel-body text-center">
+            <div class="well well-sm" style="margin-bottom:5px;">
+              <div id="tradechart"  style="height: 500px; min-width: 310px"></div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="container">
+            <div class="text-center">
+                <p>Version: <span id="getVersion" class="text-muted"></span> - PeerCount: <span id="getPeers"class="text-muted"></span></p>
+            </div>
+        </div>
+    </footer>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+</body>
+</html>
